@@ -1,0 +1,11 @@
+[package]
+name = "nft_make"
+version = "0.1.0"
+author = ["Terry Howald <terry.howald@gmail.com>"]
+edition = "2021"
+
+[dependencies]
+
+[dependencies.sdl2]
+version = "0.35.2"
+features = ["image", "ttf"]
