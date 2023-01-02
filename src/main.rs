@@ -4,39 +4,47 @@ use sdl2::keyboard::Keycode;
 use sdl2::render::{WindowCanvas, TextureCreator};
 use sdl2::video::WindowContext;
 use sdl2::rect::Rect;
+use sdl2::image::{InitFlag, LoadTexture};
 
 use std::time::Duration;
 use std::path::Path;
 
 use rand::Rng;
 
-// NFT Dimensions in pixels
+// Set constants for magic numbers
 const EIGHT_BIT: u32 = 256;
+const WHITE: u8 = (EIGHT_BIT-1) as u8;
 const NFT_WIDTH: u32 = EIGHT_BIT;
 const NFT_HEIGHT: u32 = EIGHT_BIT;
 
 fn render(canvas: &mut WindowCanvas, texture_creator: &TextureCreator<WindowContext>,
     font: &sdl2::ttf::Font, value: u32, color: sdl2::pixels::Color) -> Result<(), String> {
 
-    // Set background color
+    // Set background color of canvas
     canvas.set_draw_color(color);
     canvas.clear();
 
-    // Draw number value
-    let value_text: String = format!("{value:08b}");
-    //let value_text: String = value.to_string();
+    // Draw image on canvas
+    let image_path: &Path = Path::new(&"img/img.png");
+    let mut texture = texture_creator.load_texture(image_path)?;
+    let mut target = Rect::new(80 as i32, 80 as i32, 90 as u32, 90 as u32);
+    canvas.copy(&texture, None, Some(target))?;
+
+    // Draw number value on canvas
+    let value_text: String = format!("{:08b}", value);
     let surface = font
         .render(&value_text)
-        .blended(Color::RGB(255-color.r, 255-color.g, 255-color.b))
+        .blended(Color::RGB(WHITE-color.r, WHITE-color.g, WHITE-color.b))
         .map_err(|e| e.to_string())?;
 
-    let texture = texture_creator
+    texture = texture_creator
         .create_texture_from_surface(&surface)
         .map_err(|e| e.to_string())?;
 
-    let target = Rect::new(10 as i32, 0 as i32, 200 as u32, 100 as u32);
+    target = Rect::new(100 as i32, 10 as i32, 50 as u32, 40 as u32);
     canvas.copy(&texture, None, Some(target))?;
 
+    // Display canvas
     canvas.present();
 
     Ok(())
@@ -81,6 +89,9 @@ fn main() -> Result<(), String> {
     let mut font = ttf_context.load_font(font_path, 128)?;
     font.set_style(sdl2::ttf::FontStyle::NORMAL);
 
+    // Prepare image
+    let _image_context = sdl2::image::init(InitFlag::PNG)?;
+    
     // Initialize event pump
     let mut event_pump = sdl_context.event_pump()?;
 
