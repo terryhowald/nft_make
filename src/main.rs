@@ -36,12 +36,10 @@ fn render(canvas: &mut WindowCanvas, texture_creator: &TextureCreator<WindowCont
         .render(&value_text)
         .blended(Color::RGB(WHITE-color.r, WHITE-color.g, WHITE-color.b))
         .map_err(|e| e.to_string())?;
-
     texture = texture_creator
         .create_texture_from_surface(&surface)
         .map_err(|e| e.to_string())?;
-
-    target = Rect::new(100 as i32, 10 as i32, 50 as u32, 40 as u32);
+    target = Rect::new(100 as i32, 10 as i32, 80 as u32, 50 as u32);
     canvas.copy(&texture, None, Some(target))?;
 
     // Display canvas
@@ -87,7 +85,7 @@ fn main() -> Result<(), String> {
     let ttf_context = sdl2::ttf::init().map_err(|e| e.to_string())?;
     let font_path: &Path = Path::new(&"fonts/OpenSans-Bold.ttf");
     let mut font = ttf_context.load_font(font_path, 128)?;
-    font.set_style(sdl2::ttf::FontStyle::NORMAL);
+    font.set_style(sdl2::ttf::FontStyle::BOLD);
 
     // Prepare image
     let _image_context = sdl2::image::init(InitFlag::PNG)?;
