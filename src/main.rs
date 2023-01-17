@@ -25,9 +25,13 @@ fn render(canvas: &mut WindowCanvas, texture_creator: &TextureCreator<WindowCont
     canvas.clear();
 
     // Draw image on canvas
-    let image_path: &Path = Path::new(&"img/img.png");
+    //let image_path: &Path = Path::new(&"img/head/head_01.png");
+    let mut rng = rand::thread_rng();
+    let index: usize = rng.gen_range(0..8); 
+    let image_path = format!("img/head/head_0{}.png", index);
+
     let mut texture = texture_creator.load_texture(image_path)?;
-    let mut target = Rect::new(80 as i32, 80 as i32, 90 as u32, 90 as u32);
+    let mut target = Rect::new(80 as i32, 0 as i32, 90 as u32, 90 as u32);
     canvas.copy(&texture, None, Some(target))?;
 
     // Draw number value on canvas
@@ -39,7 +43,7 @@ fn render(canvas: &mut WindowCanvas, texture_creator: &TextureCreator<WindowCont
     texture = texture_creator
         .create_texture_from_surface(&surface)
         .map_err(|e| e.to_string())?;
-    target = Rect::new(100 as i32, 10 as i32, 80 as u32, 50 as u32);
+    target = Rect::new(85 as i32, 90 as i32, 80 as u32, 50 as u32);
     canvas.copy(&texture, None, Some(target))?;
 
     // Display canvas
@@ -100,7 +104,7 @@ fn main() -> Result<(), String> {
     'running: loop {
         for i in 1..EIGHT_BIT {
             // Generate random index and retrieve RGB values
-            let index = rng.gen_range(0..8);         
+            let index: usize = rng.gen_range(0..8);         
             let (r, g, b) = roygbiv[index];
             let color = Color::RGB(r, g, b); 
             let ib_str: String = format!("{i:08b}");
