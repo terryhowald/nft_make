@@ -7,6 +7,10 @@ edition = "2021"
 [dependencies]
 rand = "0.8.5"
 
+# Install sdl2 on Ubuntu 22.04
+# sudo apt install libsdl2-dev
+# sudo apt install libsdl2-image-dev
+# sudo apt install libsdl2-ttf-dev
 [dependencies.sdl2]
 version = "0.35.2"
 features = ["image", "ttf"]
