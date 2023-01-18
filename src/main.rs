@@ -48,13 +48,21 @@ fn render(canvas: &mut WindowCanvas, texture_creator: &TextureCreator<WindowCont
     canvas.set_draw_color(color);
     canvas.clear();
 
-    // Create head image path and draw on canvas
-    let image_path = format!("img/head/head_0{}.png", rand_data[HEAD]);
+    // Load robot head and draw on canvas
+    let mut image_path = format!("img/head/head_0{}.png", rand_data[HEAD]);
     let mut texture = texture_creator.load_texture(image_path)
         .expect("Couldn't load image");
-    let mut target = Rect::new(80 as i32, 0 as i32, 90 as u32, 90 as u32);
+    let mut target = Rect::new(86 as i32, 0 as i32, 86 as u32, 86 as u32);
     canvas.copy(&texture, None, Some(target))?;
 
+    // Load robot torso and draw on canvas
+    image_path = format!("img/torso/torso_0{}.png", rand_data[TORSO]);
+    texture = texture_creator.load_texture(image_path)
+        .expect("Couldn't load image");
+    target = Rect::new(86 as i32, 86 as i32, 86 as u32, 86 as u32);
+    canvas.copy(&texture, None, Some(target))?;    
+
+    // Draw count text on canvas
     let index_text: String = format!("{:08b}", count);
     let surface = font
         .render(&index_text)
@@ -63,7 +71,7 @@ fn render(canvas: &mut WindowCanvas, texture_creator: &TextureCreator<WindowCont
     texture = texture_creator
         .create_texture_from_surface(&surface)
         .map_err(|e| e.to_string())?;
-    target = Rect::new(85 as i32, 90 as i32, 80 as u32, 50 as u32);
+    target = Rect::new(86 as i32, 170 as i32, 80 as u32, 50 as u32);
     canvas.copy(&texture, None, Some(target))?;
 
     // Display canvas
@@ -123,7 +131,7 @@ fn main() -> Result<(), String> {
         rand_arr[TORSO] = rng.gen_range(0..8);  // Torso
   
         // Use random generated data to render new NFT
-        render(&mut canvas, &texture_creator, &font, index, rand_arr);            
+        render(&mut canvas, &texture_creator, &font, index, rand_arr)?;            
 
         // See if any events are pending
         for event in event_pump.poll_iter() {
