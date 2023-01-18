@@ -17,27 +17,47 @@ const WHITE: u8 = (EIGHT_BIT-1) as u8;
 const NFT_WIDTH: u32 = EIGHT_BIT;
 const NFT_HEIGHT: u32 = EIGHT_BIT;
 
+// Set constants for robot part indexes
+const COLOR: usize = 0;
+const ANTS: usize = 1;
+const ARMS: usize = 2;
+const HEAD: usize = 3;
+const LEGS: usize = 4;
+const TORSO: usize = 5;
+
+// Set constant array for color tuples
+const ROYGBIV: [(u8, u8, u8); 8] = [
+    (0, 0, 0),      // black
+    (255, 0, 0),    // red
+    (255, 165, 0),  // orange
+    (255, 255, 0),  // yellow
+    (0, 128, 0),    // green
+    (0, 0, 255),    // blue
+    (75, 0, 130),   // indigo
+    (238, 130, 238) // violet
+]; 
+
 fn render(canvas: &mut WindowCanvas, texture_creator: &TextureCreator<WindowContext>,
-    font: &sdl2::ttf::Font, value: u32, color: sdl2::pixels::Color) -> Result<(), String> {
+    font: &sdl2::ttf::Font, count: u32, rand_data: [i32;6]) -> Result<(), String> {      
+
+    // Determine color
+    let (r, g, b) = ROYGBIV[rand_data[COLOR] as usize];
+    let color = Color::RGB(r, g, b); 
 
     // Set background color of canvas
     canvas.set_draw_color(color);
     canvas.clear();
 
-    // Draw image on canvas
-    //let image_path: &Path = Path::new(&"img/head/head_01.png");
-    let mut rng = rand::thread_rng();
-    let index: usize = rng.gen_range(0..8); 
-    let image_path = format!("img/head/head_0{}.png", index);
-
-    let mut texture = texture_creator.load_texture(image_path)?;
+    // Create head image path and draw on canvas
+    let image_path = format!("img/head/head_0{}.png", rand_data[HEAD]);
+    let mut texture = texture_creator.load_texture(image_path)
+        .expect("Couldn't load image");
     let mut target = Rect::new(80 as i32, 0 as i32, 90 as u32, 90 as u32);
     canvas.copy(&texture, None, Some(target))?;
 
-    // Draw number value on canvas
-    let value_text: String = format!("{:08b}", value);
+    let index_text: String = format!("{:08b}", count);
     let surface = font
-        .render(&value_text)
+        .render(&index_text)
         .blended(Color::RGB(WHITE-color.r, WHITE-color.g, WHITE-color.b))
         .map_err(|e| e.to_string())?;
     texture = texture_creator
@@ -53,18 +73,6 @@ fn render(canvas: &mut WindowCanvas, texture_creator: &TextureCreator<WindowCont
     }
 
 fn main() -> Result<(), String> {
-
-    // Setup array of RGB tuples
-    let roygbiv = [
-        (0, 0, 0),      // black
-        (255, 0, 0),    // red
-        (255, 165, 0),  // orange
-        (255, 255, 0),  // yellow
-        (0, 128, 0),    // green
-        (0, 0, 255),    // blue
-        (75, 0, 130),   // indigo
-        (238, 130, 238) // violet
-    ];    
 
     // Initialize the sdl2 library
     let sdl_context = sdl2::init()?;
@@ -100,33 +108,37 @@ fn main() -> Result<(), String> {
     // Setup random number generator
     let mut rng = rand::thread_rng();
 
+    // Setup array to hold random values for color,
+    // antennas, arms, head, legs, and torso
+    let mut rand_arr: [i32; 6] = [0; 6];
+
     // Loop through NFTs
-    'running: loop {
-        for i in 1..EIGHT_BIT {
-            // Generate random index and retrieve RGB values
-            let index: usize = rng.gen_range(0..8);         
-            let (r, g, b) = roygbiv[index];
-            let color = Color::RGB(r, g, b); 
-            let ib_str: String = format!("{i:08b}");
-            println!("{} {} {} {} {}", i, r, g, b, ib_str);
-         
-            render(&mut canvas, &texture_creator, &font, i, color);            
+    'running: for index in 0..EIGHT_BIT {
+        // Generate random values for NFT image
+        rand_arr[COLOR] = rng.gen_range(0..8);  // RGB color
+        rand_arr[ANTS] = rng.gen_range(0..8);  // Antennas
+        rand_arr[ARMS] = rng.gen_range(0..8);  // Arms
+        rand_arr[HEAD] = rng.gen_range(0..8);  // Head
+        rand_arr[LEGS] = rng.gen_range(0..8);  // Legs
+        rand_arr[TORSO] = rng.gen_range(0..8);  // Torso
+  
+        // Use random generated data to render new NFT
+        render(&mut canvas, &texture_creator, &font, index, rand_arr);            
 
-            // See if any events are pending
-            for event in event_pump.poll_iter() {
-                match event {
-                    Event::Quit {..} |
-                    Event::KeyDown { 
-                        keycode: Some(Keycode::Escape), 
-                        .. 
-                        } => break 'running,
-                    _ => {}
-                }
-            } 
+        // See if any events are pending
+        for event in event_pump.poll_iter() {
+            match event {
+                Event::Quit {..} |
+                Event::KeyDown { 
+                    keycode: Some(Keycode::Escape), 
+                    .. 
+                    } => break 'running,
+                _ => {}
+            }
+        } 
 
-            // Sleep for 1 second to show NFT
-            ::std::thread::sleep(Duration::from_secs(1));
-        }
+        // Sleep for 1 second to show NFT
+        ::std::thread::sleep(Duration::from_secs(1));
     }
 
     Ok(())
