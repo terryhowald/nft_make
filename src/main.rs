@@ -62,6 +62,13 @@ fn render(canvas: &mut WindowCanvas, texture_creator: &TextureCreator<WindowCont
     target = Rect::new(86 as i32, 86 as i32, 86 as u32, 86 as u32);
     canvas.copy(&texture, None, Some(target))?;    
 
+    // Load robot antenna and draw on canvas
+    image_path = format!("img/antennas/ants_0{}.png", rand_data[ANTS]);
+    texture = texture_creator.load_texture(image_path)
+        .expect("Couldn't load image");
+    target = Rect::new(0 as i32, 0 as i32, 86 as u32, 86 as u32);
+    canvas.copy(&texture, None, Some(target))?;    
+
     // Draw count text on canvas
     let index_text: String = format!("{:08b}", count);
     let surface = font
