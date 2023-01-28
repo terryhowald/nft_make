@@ -33,7 +33,7 @@ const ROYGBIV: [(u8, u8, u8); 7] = [
     (0, 255, 0),    // green
     (255, 0, 255),  // magenta
     (0, 0, 255),    // blue
-    (255, 128, 0)   // orange
+    (255, 255, 0)   // yellow
 ]; 
 
 fn render(canvas: &mut WindowCanvas, texture_creator: &TextureCreator<WindowContext>,
@@ -42,8 +42,6 @@ fn render(canvas: &mut WindowCanvas, texture_creator: &TextureCreator<WindowCont
     // Determine background color
     let (r, g, b) = ROYGBIV[rand_data[COLOR] as usize];
     let color = Color::RGB(r, g, b); 
-
-    //println!("Background color is {:03} {:03} {:03}", b_color.r, b_color.g, b_color.b);
 
     // Set background color of canvas
     canvas.set_draw_color(color);
@@ -101,9 +99,9 @@ fn render(canvas: &mut WindowCanvas, texture_creator: &TextureCreator<WindowCont
                 if  pixels[offset] == WHITE &&
                     pixels[offset+1] == WHITE && 
                     pixels[offset+2] == WHITE {
-                    buffer[offset] = WHITE - color.r;
+                    buffer[offset] = WHITE - color.b;
                     buffer[offset+1] = WHITE - color.g;
-                    buffer[offset+2] = WHITE - color.b;
+                    buffer[offset+2] = WHITE - color.r;
                 } else {
                     buffer[offset] = pixels[offset];
                     buffer[offset+1] = pixels[offset+1];
@@ -113,13 +111,6 @@ fn render(canvas: &mut WindowCanvas, texture_creator: &TextureCreator<WindowCont
         }
     })?;
 
-    // Set canvas background to black
-    //let color = Color::RGB(0, 0, 0); 
-    //canvas.set_draw_color(color);
-    //canvas.clear();
-    //println!("Foreground color is {:03} {:03} {:03}", WHITE-color.r, WHITE-color.g, WHITE-color.b);
-    //println!("");
-
     // Update canvas with new texture
     canvas.copy(&texture, None, Some(Rect::new(0, 0, width, height)))?;
 
@@ -127,7 +118,7 @@ fn render(canvas: &mut WindowCanvas, texture_creator: &TextureCreator<WindowCont
     canvas.present();
 
     Ok(())
-    }
+}
 
 fn main() -> Result<(), String> {
 
