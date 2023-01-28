@@ -26,23 +26,24 @@ const LEGS: usize = 4;
 const TORSO: usize = 5;
 
 // Set constant array for color tuples
-const ROYGBIV: [(u8, u8, u8); 8] = [
+const ROYGBIV: [(u8, u8, u8); 7] = [
     (0, 0, 0),      // black
     (255, 0, 0),    // red
-    (255, 165, 0),  // orange
-    (255, 255, 0),  // yellow
-    (0, 128, 0),    // green
+    (0, 255, 255),  // cyan
+    (0, 255, 0),    // green
+    (255, 0, 255),  // magenta
     (0, 0, 255),    // blue
-    (75, 0, 130),   // indigo
-    (238, 130, 238) // violet
+    (255, 128, 0)   // orange
 ]; 
 
 fn render(canvas: &mut WindowCanvas, texture_creator: &TextureCreator<WindowContext>,
     font: &sdl2::ttf::Font, count: u32, rand_data: [i32;6]) -> Result<(), String> {      
 
-    // Determine color
+    // Determine background color
     let (r, g, b) = ROYGBIV[rand_data[COLOR] as usize];
     let color = Color::RGB(r, g, b); 
+
+    //println!("Background color is {:03} {:03} {:03}", b_color.r, b_color.g, b_color.b);
 
     // Set background color of canvas
     canvas.set_draw_color(color);
@@ -73,13 +74,54 @@ fn render(canvas: &mut WindowCanvas, texture_creator: &TextureCreator<WindowCont
     let index_text: String = format!("{:08b}", count);
     let surface = font
         .render(&index_text)
-        .blended(Color::RGB(WHITE-color.r, WHITE-color.g, WHITE-color.b))
+        .blended(Color::RGB(WHITE, WHITE, WHITE))
         .map_err(|e| e.to_string())?;
     texture = texture_creator
         .create_texture_from_surface(&surface)
         .map_err(|e| e.to_string())?;
     target = Rect::new(86 as i32, 170 as i32, 80 as u32, 50 as u32);
     canvas.copy(&texture, None, Some(target))?;
+
+    // Get pixels from canvas
+    let pixel_format = canvas.default_pixel_format();
+    let pixels = canvas.read_pixels(canvas.viewport(), pixel_format)?;
+    let (width, height) = canvas.output_size().unwrap();
+    let _pitch = pixel_format.byte_size_of_pixels(width as usize);
+
+    // Create texture from canvas pixels
+    texture = texture_creator
+        .create_texture_streaming(pixel_format, width, height)
+        .map_err(|e| e.to_string())?;
+
+    // Change any white pixels to color opposite of background
+    texture.with_lock(None, |buffer: &mut [u8], pitch: usize| {
+        for y in 0..256 {
+            for x in 0..256 {
+                let offset = y * pitch + x * 4;
+                if  pixels[offset] == WHITE &&
+                    pixels[offset+1] == WHITE && 
+                    pixels[offset+2] == WHITE {
+                    buffer[offset] = WHITE - color.r;
+                    buffer[offset+1] = WHITE - color.g;
+                    buffer[offset+2] = WHITE - color.b;
+                } else {
+                    buffer[offset] = pixels[offset];
+                    buffer[offset+1] = pixels[offset+1];
+                    buffer[offset+2] = pixels[offset+2];
+                }
+            }
+        }
+    })?;
+
+    // Set canvas background to black
+    //let color = Color::RGB(0, 0, 0); 
+    //canvas.set_draw_color(color);
+    //canvas.clear();
+    //println!("Foreground color is {:03} {:03} {:03}", WHITE-color.r, WHITE-color.g, WHITE-color.b);
+    //println!("");
+
+    // Update canvas with new texture
+    canvas.copy(&texture, None, Some(Rect::new(0, 0, width, height)))?;
 
     // Display canvas
     canvas.present();
@@ -130,7 +172,7 @@ fn main() -> Result<(), String> {
     // Loop through NFTs
     'running: for index in 0..EIGHT_BIT {
         // Generate random values for NFT image
-        rand_arr[COLOR] = rng.gen_range(0..8);  // RGB color
+        rand_arr[COLOR] = rng.gen_range(0..7);  // RGB color
         rand_arr[ANTS] = rng.gen_range(0..8);  // Antennas
         rand_arr[ARMS] = rng.gen_range(0..8);  // Arms
         rand_arr[HEAD] = rng.gen_range(0..8);  // Head
