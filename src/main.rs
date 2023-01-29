@@ -51,22 +51,36 @@ fn render(canvas: &mut WindowCanvas, texture_creator: &TextureCreator<WindowCont
     let mut image_path = format!("img/head/head_0{}.png", rand_data[HEAD]);
     let mut texture = texture_creator.load_texture(image_path)
         .expect("Couldn't load image");
-    let mut target = Rect::new(86 as i32, 0 as i32, 86 as u32, 86 as u32);
+    let mut target = Rect::new(86 as i32, 20 as i32, 86 as u32, 86 as u32);
     canvas.copy(&texture, None, Some(target))?;
 
     // Load robot torso and draw on canvas
     image_path = format!("img/torso/torso_0{}.png", rand_data[TORSO]);
     texture = texture_creator.load_texture(image_path)
         .expect("Couldn't load image");
-    target = Rect::new(86 as i32, 86 as i32, 86 as u32, 86 as u32);
+    target = Rect::new(80 as i32, 86 as i32, 100 as u32, 100 as u32);
     canvas.copy(&texture, None, Some(target))?;    
 
     // Load robot antenna and draw on canvas
     image_path = format!("img/antennas/ants_0{}.png", rand_data[ANTS]);
     texture = texture_creator.load_texture(image_path)
         .expect("Couldn't load image");
-    target = Rect::new(0 as i32, 0 as i32, 86 as u32, 86 as u32);
+    target = Rect::new(70 as i32, 22 as i32, 50 as u32, 50 as u32);
     canvas.copy(&texture, None, Some(target))?;    
+
+    // Load robot legs and draw on canvas
+    image_path = format!("img/legs/legs_0{}.png", rand_data[LEGS]);
+    texture = texture_creator.load_texture(image_path)
+        .expect("Couldn't load image");
+    target = Rect::new(86 as i32, 150 as i32, 86 as u32, 86 as u32);
+    canvas.copy(&texture, None, Some(target))?;      
+    
+    // Load robot arms and draw on canvas
+    image_path = format!("img/arms/arms_0{}.png", rand_data[ARMS]);
+    texture = texture_creator.load_texture(image_path)
+        .expect("Couldn't load image");
+    target = Rect::new(35 as i32, 86 as i32, 86 as u32, 86 as u32);
+    canvas.copy(&texture, None, Some(target))?;         
 
     // Draw count text on canvas
     let index_text: String = format!("{:08b}", count);
@@ -77,7 +91,7 @@ fn render(canvas: &mut WindowCanvas, texture_creator: &TextureCreator<WindowCont
     texture = texture_creator
         .create_texture_from_surface(&surface)
         .map_err(|e| e.to_string())?;
-    target = Rect::new(86 as i32, 170 as i32, 80 as u32, 50 as u32);
+    target = Rect::new(100 as i32, 0 as i32, 60 as u32, 30 as u32);
     canvas.copy(&texture, None, Some(target))?;
 
     // Get pixels from canvas
