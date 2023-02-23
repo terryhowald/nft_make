@@ -80,7 +80,9 @@ fn render(canvas: &mut WindowCanvas, texture_creator: &TextureCreator<WindowCont
     texture = texture_creator.load_texture(image_path)
         .expect("Couldn't load image");
     target = Rect::new(35 as i32, 86 as i32, 86 as u32, 86 as u32);
-    canvas.copy(&texture, None, Some(target))?;         
+    canvas.copy(&texture, None, Some(target))?;   
+    canvas.copy_ex(&texture, None, Some(Rect::new(130 as i32, 86 as i32, 86 as u32, 86 as u32)), 
+        0.0, None, false, true)?;
 
     // Draw count text on canvas
     let index_text: String = format!("{:08b}", count);
@@ -200,7 +202,7 @@ fn main() -> Result<(), String> {
         } 
 
         // Sleep for 1 second to show NFT
-        ::std::thread::sleep(Duration::from_secs(1));
+        ::std::thread::sleep(Duration::from_secs(2));
     }
 
     Ok(())
